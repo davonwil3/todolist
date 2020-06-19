@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 
 const mongoose = require("mongoose");
 const app = express();
+const lo = require("lodash");
 
 app.set('view engine', 'ejs');
 
@@ -127,7 +128,7 @@ if (!err){
     });
 
     list.save();
-
+    res.redirect("/" + customListName)
   }
   else {
 
@@ -155,6 +156,7 @@ if (!err){
 app.post("/", function(req, res){
 
   const itemName = req.body.newItem;
+  const listName = req.body.list
 
   const item = new Item({
 
@@ -163,10 +165,23 @@ app.post("/", function(req, res){
 
 
   });
+
+  if (listName === "Today"){
+
   item.save();
 
   res.redirect("/");
+}
+else {
+  List.findOne({name: listName}, function(err, foundList){
 
+    foundList.items.push(item);
+    foundList.save();
+    res.redirect("/"+ listName)
+
+
+  })
+}
 
 });
 
@@ -174,6 +189,8 @@ app.post("/", function(req, res){
 app.post("/delete", function(req, res){
 
   const checkedItemId = req.body.checkbox
+  const listName = req.body.listName
+  if (listName === "Today"){
   Item.findByIdAndRemove(checkedItemId, function(err){
 
     if(!err){
@@ -182,11 +199,23 @@ app.post("/delete", function(req, res){
 
       res.redirect("/");
     }
+    })
+  }
+else {
+  List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
+
+    if(!err){
+
+      res.redirect("/"+ listName)
+    }
+
+
+  });
+}
 
 
 
 
-  })
 
 });
 
