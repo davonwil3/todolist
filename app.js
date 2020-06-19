@@ -12,7 +12,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser: true})
+mongoose.connect("mongodb+srv://davontech3:Freshman2@cluster0-07pkr.mongodb.net/todolistDB", {useNewUrlParser: true})
 
 
 const Item = mongoose.model('Item', {
@@ -226,8 +226,15 @@ app.get("/about", function(req, res){
 });
 
 
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
 
 
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+
+
+
+app.listen(port, function() {
+  console.log("Server started success");
 });
